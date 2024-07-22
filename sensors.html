@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sensors</title>
+</head>
+<body>
+  <h1>Create Sensor</h1>
+  <form id="sensorForm">
+    <label for="type">Type:</label>
+    <select id="type">
+      <option value="temperature">Temperature</option>
+      <option value="humidity">Humidity</option>
+      <option value="speed">Speed</option>
+    </select>
+    <label for="currentValue">Current Value:</label>
+    <input type="number" id="currentValue">
+    <label for="minLimit">Min Limit:</label>
+    <input type="number" id="minLimit">
+    <label for="maxLimit">Max Limit:</label>
+    <input type="number" id="maxLimit">
+    <button type="submit">Create Sensor</button>
+  </form>
+
+  <h1>Update Sensor Value</h1>
+  <div id="sensorsList"></div>
+
+  <script src="sensor.js"></script>
+</body>
+</html>
