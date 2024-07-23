@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    button {
+      max-width: 150px;
+      min-width: 150px;
+      margin: 10px;
+      padding: 15px 30px;
+      border: none;
+      background-color: #007bff;
+      color: #fff;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <button id="sensorsButton">Sensors</button>
+    <button id="clientsButton">Clients</button>
+  </div>
+  <script>
+    const { ipcRenderer } = require('electron');
+    document.getElementById('sensorsButton').addEventListener('click', () => {
+      ipcRenderer.send('navigate', 'sensors.html');
+    });
+    document.getElementById('clientsButton').addEventListener('click', () => {
+      ipcRenderer.send('navigate', 'clients.html');
+    });
+  </script>
+</body>
+</html>

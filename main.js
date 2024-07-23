@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 
 function createWindow() {
@@ -11,38 +11,11 @@ function createWindow() {
     },
   });
 
-  //win.loadFile('sensors.html');
-
-  const menu = Menu.buildFromTemplate([
-    {
-      label: 'Menu',
-      submenu: [
-        {
-          label: 'Sensors',
-          click() {
-            win.loadFile('sensors.html');
-          },
-        },
-        {
-          label: 'Clients',
-          click() {
-            win.loadFile('clients.html');
-          },
-        },
-        {
-          type: 'separator'
-        },
-        {
-          label: 'Exit',
-          click() {
-            app.quit();
-          },
-        },
-      ],
-    },
-  ]);
-  Menu.setApplicationMenu(menu);
-  win.webContents.openDevTools();
+  win.loadFile('home.html');
+  
+  ipcMain.on('navigate', (event, file) => {
+    win.loadFile(file);
+  });
 }
 
 app.on('ready', createWindow);

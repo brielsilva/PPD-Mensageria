@@ -3,13 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <title>Clients</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    h1 {
+      color: #333;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 80%;
+      max-width: 800px;
+      margin-top: 20px;
+    }
+    #sensorsList, #messages {
+      width: 100%;
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      border-radius: 5px;
+    }
+    .sensor {
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      height: 100px;
+    }
+    .sensor-details {
+      flex-grow: 1;
+    }
+    .sensor-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .sensor button {
+      margin-left: 10px;
+      padding: 5px 10px;
+      border: none;
+      background-color: #007bff;
+      color: #fff;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .sensor button.unsubscribe {
+      background-color: #dc3545;
+    }
+    .sensor button:hover {
+      opacity: 0.8;
+    }
+    .warning {
+      color: red;
+      font-weight: bold;
+    }
+    button {
+      border: none;
+      background-color: #007bff;
+      color: #fff;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+    button.unsub {
+      background-color: red;
+    }
+  </style>
 </head>
 <body>
-  <h1>Available Sensors</h1>
-  <div id="sensorsList"></div>
+  <div class="container">
+    <h1>Available Sensors</h1>
+    <div id="sensorsList"></div>
 
-  <h1>Subscribed Topics</h1>
-  <div id="messages"></div>
+    <h1>Subscribed Topics</h1>
+    <div id="messages"></div>
+  </div>
 
   <script src="client.js"></script>
 </body>

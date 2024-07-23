@@ -40,28 +40,28 @@ function addSensorToList(sensor) {
 }
 
 window.updateSensorValue = function(sensorId, minLimit, maxLimit) {
+  const inputElement = document.getElementById(`newValue-${sensorId}`);
   const newValue = document.getElementById(`newValue-${sensorId}`).value;
   if (newValue < minLimit || newValue > maxLimit) {
     alert(`Value must be between ${minLimit} and ${maxLimit}`);
-    return;
-  }
-
-  const sensorDiv = document.getElementById(sensorId);
-  const sensorType = sensorDiv.querySelector('div').innerText.split(', Type: ')[1];
+  } else {
+    const sensorDiv = document.getElementById(sensorId);
+    const sensorType = sensorDiv.querySelector('div').innerText.split(', Type: ')[1];
+    
+    const sensorUpdate = {
+      id: sensorId,
+      type: sensorType,
+      currentValue: Number(newValue)
+    };
   
-  const sensorUpdate = {
-    id: sensorId,
-    type: sensorType,
-    currentValue: Number(newValue)
-  };
-
-  // Publicar o novo valor do sensor
-  client.publish(`sensor/${sensorId}`, JSON.stringify(sensorUpdate));
-
-  // Publicar aviso se o valor for exatamente o limite superior ou inferior
-  if (Number(newValue) === minLimit) {
-    client.publish(`sensor/${sensorId}/warning`, JSON.stringify({ id: sensorId, type: sensorType, message: `Value reached minimum limit: ${minLimit}` }));
-  } else if (Number(newValue) === maxLimit) {
-    client.publish(`sensor/${sensorId}/warning`, JSON.stringify({ id: sensorId, type: sensorType, message: `Value reached maximum limit: ${maxLimit}` }));
+    // Publicar o novo valor do sensor
+    client.publish(`sensor/${sensorId}`, JSON.stringify(sensorUpdate));
+  
+    // Publicar aviso se o valor for exatamente o limite superior ou inferior
+    if (Number(newValue) === minLimit) {
+      client.publish(`sensor/${sensorId}/warning`, JSON.stringify({ id: sensorId, type: sensorType, message: `Value reached minimum limit: ${minLimit}` }));
+    } else if (Number(newValue) === maxLimit) {
+      client.publish(`sensor/${sensorId}/warning`, JSON.stringify({ id: sensorId, type: sensorType, message: `Value reached maximum limit: ${maxLimit}` }));
+    }
   }
 };

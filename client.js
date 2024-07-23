@@ -19,13 +19,20 @@ client.on('message', (topic, message) => {
   if (topic === 'sensor/registration') {
     const sensorData = JSON.parse(message.toString());
     if (!availableSensors.includes(sensorData.id)) {
-      const sensorDiv = document.createElement('div');
-      sensorDiv.innerHTML = `
-        Sensor ID: ${sensorData.id}, Type: ${sensorData.type}
-        <button onclick="subscribeToSensor('${sensorData.id}')">Subscribe</button>
-        <button onclick="unsubscribeFromSensor('${sensorData.id}')">Unsubscribe</button>
+      const sensorContainer = document.createElement('div');
+      sensorContainer.classList.add('sensor')
+      const sensorType = document.createElement('div');
+      const sensorButtons = document.createElement('div');
+      sensorType.innerHTML = `
+        <span>Sensor ID: ${sensorData.id}, Type: ${sensorData.type}</span>
       `;
-      sensorsList.appendChild(sensorDiv);
+      sensorButtons.innerHTML = `
+        <button onclick="subscribeToSensor('${sensorData.id}')">Subscribe</button>
+        <button class="unsub" onclick="unsubscribeFromSensor('${sensorData.id}')">Unsubscribe</button>
+      `
+      sensorContainer.appendChild(sensorType)
+      sensorContainer.appendChild(sensorButtons)
+      sensorsList.appendChild(sensorContainer);
       availableSensors.push(sensorData.id);
     }
   } else if (topicParts[2] === 'warning') {
@@ -36,9 +43,23 @@ client.on('message', (topic, message) => {
     messagesDiv.appendChild(warningDiv);
   } else {
     const sensorData = JSON.parse(message.toString());
-    const sensorDiv = document.createElement('div');
-    sensorDiv.innerText = `Sensor ID: ${sensorData.id}, Type: ${sensorData.type}, Value: ${sensorData.currentValue}`;
-    messagesDiv.appendChild(sensorDiv);
+    const sensorValueSpan = document.getElementById(`value-${sensorData.id}`);
+    if (sensorValueSpan) {
+      sensorValueSpan.innerText = sensorData.currentValue;
+    } else {
+      const sensorDiv = document.createElement('div');
+      const sensorDetails = document.createElement('div');
+      sensorDiv.classList.add('sensor')
+      sensorDetails.className = 'sensor-details';
+      sensorDetails.innerHTML = `
+        <div>Sensor ID: ${sensorData.id}</div>
+        <div>Type: ${sensorData.type}</div>
+        <div>Current Value: <span id="value-${sensorData.id}">${sensorData.currentValue}</span></div>
+      `;
+      //sensorDiv.innerText = `Sensor ID: ${sensorData.id}, Type: ${sensorData.type}, Value: ${sensorData.currentValue}`;
+      sensorDiv.appendChild(sensorDetails)
+      messagesDiv.appendChild(sensorDiv);
+    }
   }
 });
 
