@@ -1,23 +1,6 @@
 const client = require('./connection');
 const sensorsList = document.getElementById('sensorsList');
 
-client.on('connect', () => {
-  client.subscribe('sensor/registration', { qos: 1 }, (err) => {
-    if (!err) {
-      console.log('Subscribed to sensor registration topic');
-      client.publish('sensor/registration/request', 'Requesting existing sensors');
-    }
-  });
-});
-
-client.on('message', (topic, message) => {
-  const topicParts = topic.split('/');
-  if (topic === 'sensor/registration') {
-    const sensorData = JSON.parse(message.toString());
-    addSensorToList(sensorData);
-  }
-});
-
 document.getElementById('sensorForm').addEventListener('submit', (event) => {
   event.preventDefault();
   const type = document.getElementById('type').value;
@@ -77,4 +60,3 @@ window.updateSensorValue = function(sensorId, minLimit, maxLimit) {
   }
 };
 
-client.publish('sensor/registration/request', JSON.stringify({ action: 'fetch' }));
