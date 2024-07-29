@@ -1,6 +1,23 @@
 const client = require('./connection');
 const sensorsList = document.getElementById('sensorsList');
 
+client.on('connect', () => {
+  client.subscribe('sensor/registration', { qos: 1 }, (err) => {
+    if (!err) {
+      console.log('Subscribed to sensor registration topic');
+      client.publish('sensor/registration/request', 'Requesting existing sensors');
+    }
+  });
+});
+
+client.on('message', (topic, message) => {
+  const topicParts = topic.split('/');
+  if (topic === 'sensor/registration') {
+    const sensorData = JSON.parse(message.toString());
+    addSensorToList(sensorData);
+  }
+});
+
 document.getElementById('sensorForm').addEventListener('submit', (event) => {
   event.preventDefault();
   const type = document.getElementById('type').value;
@@ -17,13 +34,9 @@ document.getElementById('sensorForm').addEventListener('submit', (event) => {
     maxLimit: Number(maxLimit)
   };
 
-  // Publicar dados do sensor
   client.publish(`sensor/${sensorId}`, JSON.stringify(sensor));
-
-  // Publicar mensagem de registro do sensor como mensagem retida
   client.publish('sensor/registration', JSON.stringify(sensor), { retain: true });
 
-  // Adicionar sensor à lista para atualização
   addSensorToList(sensor);
 });
 
@@ -41,7 +54,7 @@ function addSensorToList(sensor) {
 
 window.updateSensorValue = function(sensorId, minLimit, maxLimit) {
   const inputElement = document.getElementById(`newValue-${sensorId}`);
-  const newValue = document.getElementById(`newValue-${sensorId}`).value;
+  const newValue = inputElement.value;
   if (newValue < minLimit || newValue > maxLimit) {
     alert(`Value must be between ${minLimit} and ${maxLimit}`);
   } else {
@@ -53,15 +66,15 @@ window.updateSensorValue = function(sensorId, minLimit, maxLimit) {
       type: sensorType,
       currentValue: Number(newValue)
     };
-  
-    // Publicar o novo valor do sensor
+
     client.publish(`sensor/${sensorId}`, JSON.stringify(sensorUpdate));
-  
-    // Publicar aviso se o valor for exatamente o limite superior ou inferior
+
     if (Number(newValue) === minLimit) {
-      client.publish(`sensor/${sensorId}/warning`, JSON.stringify({ id: sensorId, type: sensorType, message: `Value reached minimum limit: ${minLimit}` }));
+      client.publish(`sensor/${sensorId}/warning`, JSON.stringify({ id: sensorId, type: sensorType, message: `Value reached minimum limit: ${minLimit}`, currentValue: Number(newValue) }));
     } else if (Number(newValue) === maxLimit) {
-      client.publish(`sensor/${sensorId}/warning`, JSON.stringify({ id: sensorId, type: sensorType, message: `Value reached maximum limit: ${maxLimit}` }));
+      client.publish(`sensor/${sensorId}/warning`, JSON.stringify({ id: sensorId, type: sensorType, message: `Value reached maximum limit: ${maxLimit}`, currentValue: Number(newValue) }));
     }
   }
 };
+
+client.publish('sensor/registration/request', JSON.stringify({ action: 'fetch' }));

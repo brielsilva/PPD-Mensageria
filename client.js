@@ -20,7 +20,7 @@ client.on('message', (topic, message) => {
     const sensorData = JSON.parse(message.toString());
     if (!availableSensors.includes(sensorData.id)) {
       const sensorContainer = document.createElement('div');
-      sensorContainer.classList.add('sensor')
+      sensorContainer.classList.add('sensor');
       const sensorType = document.createElement('div');
       const sensorButtons = document.createElement('div');
       sensorType.innerHTML = `
@@ -29,35 +29,69 @@ client.on('message', (topic, message) => {
       sensorButtons.innerHTML = `
         <button onclick="subscribeToSensor('${sensorData.id}')">Subscribe</button>
         <button class="unsub" onclick="unsubscribeFromSensor('${sensorData.id}')">Unsubscribe</button>
-      `
-      sensorContainer.appendChild(sensorType)
-      sensorContainer.appendChild(sensorButtons)
+      `;
+      sensorContainer.appendChild(sensorType);
+      sensorContainer.appendChild(sensorButtons);
       sensorsList.appendChild(sensorContainer);
       availableSensors.push(sensorData.id);
     }
   } else if (topicParts[2] === 'warning') {
-    const warningData = JSON.parse(message.toString());
-    const warningDiv = document.createElement('div');
-    warningDiv.style.color = 'red';
-    warningDiv.innerText = `WARNING from Sensor ID: ${warningData.id}, Type: ${warningData.type}: ${warningData.message}`;
-    messagesDiv.appendChild(warningDiv);
+    console.log("WARNING")
+    const sensorData = JSON.parse(message.toString());
+    const sensorValueSpan = document.getElementById(`value-${sensorData.id}`);
+    const containerSensor = sensorValueSpan ? sensorValueSpan.parentElement : null;
+    if (sensorValueSpan) {
+      console.log("SENSORVALUESPAN")
+      sensorValueSpan.innerText = `${sensorData.currentValue}`;
+      if (containerSensor) {
+        const warningDiv = containerSensor.parentElement.querySelector('.warning-message');
+        console.log(warningDiv)
+        if (!warningDiv) {
+          const warnDiv = document.createElement('div');
+          warnDiv.classList.add("warning-message")
+          warnDiv.style.color = "red"
+          warnDiv.innerText = `WARNING:${sensorData.message}`;
+          containerSensor.parentElement.appendChild(warnDiv)
+        }
+      }
+    } else {
+      console.log("ELSE SENSORVALUESPAN")
+      const sensorDiv = document.createElement('div');
+      const sensorDetails = document.createElement('div');
+      sensorDiv.classList.add('sensor');
+      sensorDetails.className = 'sensor-details';
+      sensorDetails.innerHTML = `
+        <div>Sensor ID: ${sensorData.id}</div>
+        <div>Type: ${sensorData.type}</div>
+        <div>Current Value: <span id="value-${sensorData.id}">${sensorData.currentValue}</span></div>
+        <div class="warning-message" style="color: red;">WARNING:${sensorData.message}</div>
+      `;
+      sensorDiv.appendChild(sensorDetails);
+      messagesDiv.appendChild(sensorDiv);
+    }
   } else {
     const sensorData = JSON.parse(message.toString());
     const sensorValueSpan = document.getElementById(`value-${sensorData.id}`);
     if (sensorValueSpan) {
       sensorValueSpan.innerText = sensorData.currentValue;
+      const containerSensor = sensorValueSpan.parentElement;
+      if (containerSensor) {
+        const warningDiv = containerSensor.parentElement.querySelector('.warning-message');
+        if (warningDiv) {
+          containerSensor.parentElement.removeChild(warningDiv);
+        }
+      }
     } else {
       const sensorDiv = document.createElement('div');
       const sensorDetails = document.createElement('div');
-      sensorDiv.classList.add('sensor')
+      sensorDiv.classList.add('sensor');
       sensorDetails.className = 'sensor-details';
       sensorDetails.innerHTML = `
         <div>Sensor ID: ${sensorData.id}</div>
         <div>Type: ${sensorData.type}</div>
         <div>Current Value: <span id="value-${sensorData.id}">${sensorData.currentValue}</span></div>
       `;
-      //sensorDiv.innerText = `Sensor ID: ${sensorData.id}, Type: ${sensorData.type}, Value: ${sensorData.currentValue}`;
-      sensorDiv.appendChild(sensorDetails)
+      sensorDiv.appendChild(sensorDetails);
       messagesDiv.appendChild(sensorDiv);
     }
   }
@@ -69,7 +103,7 @@ window.subscribeToSensor = function(sensorId) {
       if (!err) {
         console.log(`Subscribed to sensor/${sensorId}`);
         subscribedTopics.push(sensorId);
-        // Subscribe to warning topic
+        
         client.subscribe(`sensor/${sensorId}/warning`, { qos: 1 }, (err) => {
           if (!err) {
             console.log(`Subscribed to sensor/${sensorId}/warning`);
@@ -89,7 +123,7 @@ window.unsubscribeFromSensor = function(sensorId) {
         clearMessagesForSensor(sensorId);
       }
     });
-    // Unsubscribe from warning topic
+
     client.unsubscribe(`sensor/${sensorId}/warning`, (err) => {
       if (!err) {
         console.log(`Unsubscribed from sensor/${sensorId}/warning`);

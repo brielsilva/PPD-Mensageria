@@ -6,8 +6,8 @@ const config = {
     port: "1883",
 };
 
-let sensors = []; // List to hold sensors
-let subscribedTopics = new Set(); // Set to hold subscribed topics
+let sensors = []; 
+let subscribedTopics = new Set();
 
 const clientId = "client" + Math.random().toString(36).substring(7);
 
